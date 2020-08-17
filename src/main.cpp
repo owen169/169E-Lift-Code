@@ -10,11 +10,10 @@ void disabled() {}
 void competition_initialize() {}
 
 void autonomous() {
-
 	// Initialize the Chassis with Odometry
 	std::shared_ptr<OdomChassisController> chassis =
 	  ChassisControllerBuilder()
-	    .withMotors({14, 16}, {15, 17}) // Left: 14,16 | Right: 15, 17
+	    .withMotors({14, 16}, {15, 17}) // Left: 14, 16 | Right: 15, 17
 	    .withDimensions(AbstractMotor::gearset::green, {{4.32_in, 12.25_in}, imev5GreenTPR}) // Drop Center Wheels: 4.32in
 	    .withSensors(ADIEncoder{'A', 'B', true}, ADIEncoder{'C', 'D'}) // Left Tracking Pod: 'A', 'B' | Right Tracking Pod: 'C', 'D'
 	    .withOdometry({{2.75_in, 6.25_in}, quadEncoderTPR}) // Pods: 2.75" Omni Wheel
@@ -41,8 +40,6 @@ void autonomous() {
 
 	// Set point to 0, 0
 	chassis->setState({0_in, 0_in, 0_deg});
-
-	// START GOAL 1
 
 	topRoller.move(127); // Spin Top Roller
 	liftController->setTarget(2100); // Raise Lift
@@ -170,7 +167,6 @@ void autonomous() {
     	{{0_ft, 0_ft, 0_deg}, {-2_ft, 0_ft, 0_deg}}, "Goal3Backup2");
 	profileController->setTarget("Goal3Backup2", true); // Backup from the third goal
 	profileController->waitUntilSettled(); // Wait until finished
-
 }
 
 void opcontrol() {
@@ -189,17 +185,17 @@ void opcontrol() {
 	    
 		pros::lcd::print(2, "arm %d", arm_poten.get_value()); // Print the arm value to the LCD
 
-		// Drive Code
+		// Tank Drive Code
 		leftBackDrive.move(controller.get_analog(ANALOG_LEFT_Y));
 		leftFrontDrive.move(controller.get_analog(ANALOG_LEFT_Y));
 		rightBackDrive.move(controller.get_analog(ANALOG_RIGHT_Y));
     	rightFrontDrive.move(controller.get_analog(ANALOG_RIGHT_Y));
 
 		// Side Rollers
-		if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1) == 1){
+		if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1) == 1){ // Side Rollers In
 			leftIntake.move(127);
 			rightIntake.move(127);
-		} else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2) == 1) {
+		} else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2) == 1) { // Side Rollers Out
 			leftIntake.move(-127);
 			rightIntake.move(-127);
 		} else {
@@ -208,24 +204,24 @@ void opcontrol() {
 		}
 
 		// Top Rollers
-		if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1) == 1){
+		if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1) == 1){ // Top Roller In
 			topRoller.move(127);
-		} else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2) == 1) {
+		} else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2) == 1) { // Top Roller Out
 			topRoller.move(-127);
 		} else {
 			topRoller.move(0);
 		}
 
 		// Lift
-		if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)==1){
+		if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)==1){ // Lift Down
 			liftController->setTarget(1025);
-		} else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT)==1){
+		} else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT)==1){ // Lift Raised Intake
 			liftController->setTarget(1500);
-		} else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT)==1){
+		} else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT)==1){ // Lift Goal Height
 			liftController->setTarget(2000);
-		} else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_UP)==1){
+		} else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_UP)==1){ // Lift Max Height
 			liftController->setTarget(2400);
-		} else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_A)==1){
+		} else if(controller.get_digital(pros::E_CONTROLLER_DIGITAL_A)==1){ // Transfer Override
 			liftController->setTarget(800);
 		}
 
